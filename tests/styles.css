@@ -1,0 +1,6 @@
+.sm-modal {
+    box-sizing: border-box;
+    padding: 1em;
+    border: 5px solid #d4d4d4;
+    background-color: #fff;
+}

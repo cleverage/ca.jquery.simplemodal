@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simplemodal jQuery Plug-in - Tests suite</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <button class="mybox-noauto">Click Me!</button>
+
+    <div id="mybox-auto">
+        <h2>Simplemodal Box - Auto-Open</h2>
+        <p>This box will open automatically at instanciation.</p>
+        <p>You should see it when the page is loaded without any action.</p>
+
+        <p>To close it, click on the background, or <button>click me !</button></p>
+    </div>
+
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../ca.jquery.simplemodal.js"></script>
+    <script>
+        (function ($) {
+
+            // Auto Open test
+            $('#mybox-auto')
+            .simplemodal({
+                autoOpen: true
+            })
+            .find('button')
+                .on('click', function () {
+                    $('#mybox-auto').simplemodal('close');
+                });
+
+        })(jQuery);
+    </script>
+</body>
+</html>
