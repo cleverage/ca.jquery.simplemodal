@@ -1,0 +1,27 @@
+{
+  "name": "ca.jquery.simplemodal",
+  "version": "1.0.0",
+  "description": "A lightweight and very simple modal for jQuery",
+  "main": "ca.jquery.simplemodal.js",
+  "scripts": {
+    "test": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cleverage/ca.jquery.simplemodal.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cleverage/ca.jquery.simplemodal/issues"
+  },
+  "homepage": "https://github.com/cleverage/ca.jquery.simplemodal",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-casper": "^0.3.8",
+    "grunt-contrib-connect": "^0.7.1",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.4.0",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
