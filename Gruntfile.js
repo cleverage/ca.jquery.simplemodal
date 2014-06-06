@@ -70,7 +70,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Customs tasks
-  grunt.registerTask('test',  ['casper:tests', 'jshint:tests']);
+  grunt.registerTask('test',  [/*'casper:tests', */'jshint:tests']);
   grunt.registerTask('build', ['connect:basic', 'test', 'uglify:build']);
   grunt.registerTask('live',  ['connect:basic', 'watch']);
 
