@@ -25,12 +25,29 @@
             // Auto Open test
             $('#mybox-auto')
             .simplemodal({
-                autoOpen: true
+                autoOpen: true,
+                autoDestroy: true
             })
             .find('button')
                 .on('click', function () {
                     $('#mybox-auto').simplemodal('close');
                 });
+
+            // Casper Mode test
+            var $casper = $('<div/>');
+
+            $('<p/>', {text: 'This modal modal box content is ghosted. It does not sit inside the DOM until the modal is created =).'})
+            .appendTo($casper);
+            $('<p/>', {text: 'To close it, click on the background layer or use the ESC key. You can also click to the upper-right close button.'})
+            .appendTo($casper);
+
+            $casper.simplemodal({
+                closeButton: true
+            });
+
+            $('button.mybox-noauto').on('click', function () {
+                $casper.simplemodal('open');
+            });
 
         })(jQuery);
     </script>
