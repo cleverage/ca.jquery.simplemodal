@@ -108,7 +108,7 @@
       .css({
         position : 'fixed',
         zIndex: 9999,
-        top: this.options.top? this.options.top : '50%',
+        top: this.options.top ? this.options.top : '50%',
         left : '50%'
       })
       .hide()
@@ -188,7 +188,7 @@
       //
       this.$el
       .css({
-        marginTop: this.options.top? 0 : this.$el.outerHeight() / -2 + 'px',
+        marginTop : this.options.top ? 0 : this.$el.outerHeight() / -2 + 'px',
         marginLeft: this.$el.outerWidth() / -2 + 'px'
       })
       // Then fade it from `0` tp `100` and call the optional `onOpen` callback
