@@ -26,17 +26,6 @@
 
   // Default options and settings
   namespace ='simplemodal';
-  defaults = {
-    top: null,              // Fix `Top` position instead of vertical centering
-    overlay: 0.5,           // Set overlay opacity
-    closeButton: false,     // Enable / Disable a close button inside the modal
-    className: null,        // Add one (or more) class(es) to the modal box
-    duration: 500,          // Duration of transition
-    autoOpen: false,        // Open the modalbox when created
-    autoDestroy: false,     // Destroy the modalbox when it is closed
-    onOpen: function() {},  // Callback to execute at Open event
-    onClose: function() {}  // Callback to execute at Close event
-  };
 
   // PLUGIN
   // ===========================================================================
@@ -304,4 +293,16 @@
     });
   };
 
+  // Default configuration
+  $.fn[namespace].defaults = {
+    top         : null,          // Fix `Top` position instead of vertical centering
+    overlay     : 0.5,           // Set overlay opacity
+    closeButton : false,         // Enable / Disable a close button inside the modal
+    className   : null,          // Add one (or more) class(es) to the modal box
+    duration    : 500,           // Duration of transition
+    autoOpen    : false,         // Open the modalbox when created
+    autoDestroy : false,         // Destroy the modalbox when it is closed
+    onOpen      : function() {}, // Callback to execute at Open event
+    onClose     : function() {}  // Callback to execute at Close event
+  };
 })(jQuery);
