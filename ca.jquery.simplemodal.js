@@ -172,8 +172,12 @@
       // the context inside the callback).
       //
       var close = $.proxy(this.close, this),
-          onOpen = $.proxy(this.options.onOpen, this.element);
           toggleLoader = $.proxy(this._toggleLoader, this),
+          onOpen = $.noop;
+
+      if ($.type(this.options.opOpen) === 'function') {
+        onOpen = $.proxy(this.options.onOpen, this.element);
+      }
 
       // Animate the overlay with a fade from `0` to the passed option value.
       // Toggle the throbber (show it) inside the overlay for waiting to the
@@ -217,7 +221,9 @@
       var onClose = $.proxy(function () {
         // Proxying the optional `onClose` callback to the current DOM element
         // mapped to the context inside the callback.
-        this.options.onClose.call(this.element);
+        if ($.type(this.options.onClose) === 'function') {
+          this.options.onClose.call(this.element);
+        }
 
         // If the modalbox needs to be disposed when closed, we destroy it.
         if (this.options.autoDestroy) {
