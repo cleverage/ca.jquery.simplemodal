@@ -48,8 +48,8 @@
       this.$el = setModal.call(this);
 
       // Open the modalbox if setted as it.
-      if (this.options.autoOpen) { this.open(); }
-    };
+      if (this.options.autoOpen) { this.open(); }
+    }
 
     // Overlay template
     // ----------------
