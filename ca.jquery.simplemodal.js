@@ -22,10 +22,8 @@
 (function($, undefined) {
   'use strict';
 
-  var Plugin, defaults, namespace;
-
   // Default options and settings
-  namespace ='simplemodal';
+  var namespace = 'simplemodal';
 
   // PLUGIN
   // ===========================================================================
