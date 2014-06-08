@@ -44,17 +44,17 @@
       this.options = $.extend({}, $.fn[namespace].defaults, options);
 
       // Create and stores all DOM elements using the Plugin as context.
-      this.$overlay = setOverlay.call(this);
-      this.$el = setModal.call(this);
+      this.$overlay = this._setOverlay();
+      this.$el      = this._setModal();
 
       // Open the modalbox if setted as it.
       if (this.options.autoOpen) { this.open(); }
     }
 
-    // Overlay template
-    // ----------------
+    // Overlay template (pseudo private)
+    // ---------------------------------
     //
-    var setOverlay = function () {
+    Plugin.prototype._setOverlay = function () {
       // Create a jQuery Node, passing some CSS properties, and attaching to it
       // some events.
       //
@@ -140,12 +140,12 @@
       return $el;
     };
 
-    // ToggleLoader
-    // ------------
+    // ToggleLoader (pseudo private)
+    // -----------------------------
     //
     // Simple toggle wrapper for the thobber inside the current overlay.
     //
-    var toggleLoader = function () {
+    Plugin.prototype._toggleLoader = function () {
       this.$overlay.find('.' + $.fn[namespace].className.loader).toggle();
     };
 
@@ -172,8 +172,8 @@
       // the context inside the callback).
       //
       var close = $.proxy(this.close, this),
-          toggleLoader = $.proxy(toggleLoader, this),
           onOpen = $.proxy(this.options.onOpen, this.element);
+          toggleLoader = $.proxy(this._toggleLoader, this),
 
       // Animate the overlay with a fade from `0` to the passed option value.
       // Toggle the throbber (show it) inside the overlay for waiting to the
@@ -229,7 +229,7 @@
       // at end and calling the optional `onClose` callback.
       //
       this.$overlay
-      .fadeOut(this.options.duration, $.proxy(toggleLoader, this));
+      .fadeOut(this.options.duration, $.proxy(this._toggleLoader, this));
 
       this.$el
       .fadeOut(this.options.duration, onClose);
@@ -277,7 +277,7 @@
         $.data(this, ns, new Plugin(this, options));
       }
       // If the plugin contains the called method, apply it
-      else if(plugin[_] && $.type(plugin[_]) === 'function') {
+      else if(plugin[_] && $.type(plugin[_]) === 'function' && _.indexOf('_') !== 0) {
         return plugin[_].apply(plugin, args);
       }
     });
