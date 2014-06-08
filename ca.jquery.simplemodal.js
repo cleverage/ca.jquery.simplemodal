@@ -43,14 +43,6 @@
       this.element = element;
       this.options = $.extend({}, $.fn[namespace].defaults, options);
 
-      // Fire the init method
-      this.init();
-    }
-
-    // Initialization
-    // --------------
-    //
-    Plugin.prototype.init = function() {
       // Create and stores all DOM elements using the Plugin as context.
       this.$overlay = setOverlay.call(this);
       this.$el = setModal.call(this);
