@@ -41,8 +41,6 @@
     function Plugin(element, options) {
       // Store elements to access it later easily
       this.element = element;
-      this._defaults = defaults;
-      this._name = namespace;
       this.options = $.extend({}, $.fn[namespace].defaults, options);
 
       // Fire the init method
