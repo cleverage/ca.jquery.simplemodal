@@ -131,8 +131,8 @@
       // modalbox container. It's a simple `<button>` with a click handler
       // that'll call the plugin close method.
       if (this.options.closeButton) {
-        .append( $('<span/>', {'text': 'close'}) )
         $('<button/>', {'class': $.fn[namespace].className.close})
+        .append( $('<span/>', {'text': $.fn[namespace].l10n.close}) )
         .on('click', $.proxy(this.close, this))
         .appendTo($el);
       }
@@ -303,5 +303,10 @@
     modal   : 'sm-modal',
     content : 'sm-content',
     close   : 'sm-close'
+  };
+
+  // Default displayed string
+  $.fn[namespace].l10n = {
+    close : 'close'
   };
 })(jQuery);
