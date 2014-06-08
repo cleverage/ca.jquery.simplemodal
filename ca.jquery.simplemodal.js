@@ -65,7 +65,7 @@
       // Each overlay is dependent to its modalbox. So you'll have as many
       // overlays as you've got active modals.
       //
-      var $el = $('<div/>', {'class': 'sm-overlay'})
+      var $el = $('<div/>', {'class': $.fn[namespace].className.overlay})
       .css({
         position: 'fixed',
         zIndex: 9999,
@@ -82,23 +82,23 @@
       // Create a jQuery Node as overlay child to be used as a throbber. It'll
       // show at call and hide when the modal appear.
       //
-      $('<div/>', {'class': 'sm-loader'})
+      $('<div/>', {'class': $.fn[namespace].className.loader})
       .hide()
       .appendTo($el);
 
       return $el;
     };
 
-    // Modal template
-    // --------------
+    // Modal template (pseudo private)
+    // -------------------------------
     //
-    var setModal = function () {
+    Plugin.prototype._setModal = function () {
       var $el,
           // Expand className with the default modal className and custom ones.
-          className = 'sm-modal';
+          className = $.fn[namespace].className.modal;
 
       if (this.options.className) {
-       className += ' ' + this.options.className;
+        className += ' ' + this.options.className;
       }
 
       // Create a jQuery Node for the modal box container, and set some CSS
@@ -123,7 +123,7 @@
       // directly into the modalbox, but remember that this content will be
       // loose if you don't save it before the modalbox disposing.
       //
-      $('<div/>', {'class': 'sm-content'})
+      $('<div/>', {'class': $.fn[namespace].className.content})
       .append( $(this.element) )
       .appendTo($el);
 
@@ -131,8 +131,8 @@
       // modalbox container. It's a simple `<button>` with a click handler
       // that'll call the plugin close method.
       if (this.options.closeButton) {
-        $('<button/>', {'class': 'sm-close'})
         .append( $('<span/>', {'text': 'close'}) )
+        $('<button/>', {'class': $.fn[namespace].className.close})
         .on('click', $.proxy(this.close, this))
         .appendTo($el);
       }
@@ -146,7 +146,7 @@
     // Simple toggle wrapper for the thobber inside the current overlay.
     //
     var toggleLoader = function () {
-      this.$overlay.find('.sm-loader').toggle();
+      this.$overlay.find('.' + $.fn[namespace].className.loader).toggle();
     };
 
     // Open (public)
@@ -294,5 +294,14 @@
     autoDestroy : false,         // Destroy the modalbox when it is closed
     onOpen      : function() {}, // Callback to execute at Open event
     onClose     : function() {}  // Callback to execute at Close event
+  };
+
+  // Default class names
+  $.fn[namespace].className = {
+    overlay : 'sm-overlay',
+    loader  : 'sm-loader',
+    modal   : 'sm-modal',
+    content : 'sm-content',
+    close   : 'sm-close'
   };
 })(jQuery);
