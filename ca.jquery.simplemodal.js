@@ -22,256 +22,230 @@
 (function($, undefined) {
   'use strict';
 
-  var Plugin, defaults, namespace;
-
   // Default options and settings
-  namespace ='simplemodal';
-  defaults = {
-    top: null,              // Fix `Top` position instead of vertical centering
-    overlay: 0.5,           // Set overlay opacity
-    closeButton: false,     // Enable / Disable a close button inside the modal
-    className: null,        // Add one (or more) class(es) to the modal box
-    duration: 500,          // Duration of transition
-    autoOpen: false,        // Open the modalbox when created
-    autoDestroy: false,     // Destroy the modalbox when it is closed
-    onOpen: function() {},  // Callback to execute at Open event
-    onClose: function() {}  // Callback to execute at Close event
-  };
+  var namespace = 'simplemodal';
 
   // PLUGIN
   // ===========================================================================
-  //
-  // Declare the plugin fuction, isolated in a sub-module pattern to prevent
-  // leaks and preserve vars scope.
-  //
-  Plugin = (function() {
 
-    // The Plugin object
-    // -----------------
+  // The Plugin object
+  // -----------------
+  //
+  function Plugin(element, options) {
+    // Store elements to access it later easily
+    this.element = element;
+    this.options = $.extend({}, $.fn[namespace].defaults, options);
+
+    // Create and stores all DOM elements using the Plugin as context.
+    this.$overlay = this._setOverlay();
+    this.$el      = this._setModal();
+
+    // Open the modalbox if setted as it.
+    if (this.options.autoOpen) { this.open(); }
+  }
+
+  // Overlay template (pseudo private)
+  // ---------------------------------
+  //
+  Plugin.prototype._setOverlay = function () {
+    // Create a jQuery Node, passing some CSS properties, and attaching to it
+    // some events.
     //
-    function Plugin(element, options) {
-      // Store elements to access it later easily
-      this.element = element;
-      this.options = $.extend({}, defaults, options);
-      this._defaults = defaults;
-      this._name = namespace;
+    // The Overlay is used as a fog layer behind the modal box. It receive a
+    // click handler to call the plugin close method to close the modal on a
+    // click on the fog
+    //
+    // Each overlay is dependent to its modalbox. So you'll have as many
+    // overlays as you've got active modals.
+    //
+    var $el = $('<div/>', {'class': $.fn[namespace].className.overlay})
+    .css({
+      position: 'fixed',
+      zIndex: 9999,
+      top: 0,
+      left: 0,
+      height: '100%',
+      width: '100%',
+      background: '#000'
+    })
+    .hide()
+    .on('click', $.proxy(this.close, this))
+    .appendTo('body');
 
-      // Fire the init method
-      this.init();
+    // Create a jQuery Node as overlay child to be used as a throbber. It'll
+    // show at call and hide when the modal appear.
+    //
+    $('<div/>', {'class': $.fn[namespace].className.loader})
+    .hide()
+    .appendTo($el);
+
+    return $el;
+  };
+
+  // Modal template (pseudo private)
+  // -------------------------------
+  //
+  Plugin.prototype._setModal = function () {
+    var $el,
+        // Expand className with the default modal className and custom ones.
+        className = $.fn[namespace].className.modal;
+
+    if (this.options.className) {
+      className += ' ' + this.options.className;
     }
 
-    // Initialization
-    // --------------
+    // Create a jQuery Node for the modal box container, and set some CSS
+    // properties.
     //
-    Plugin.prototype.init = function() {
-      // Create and stores all DOM elements using the Plugin as context.
-      this.$overlay = setOverlay.call(this);
-      this.$el = setModal.call(this);
+    $el = $('<div/>', {'class': className})
+    .css({
+      position : 'fixed',
+      zIndex: 9999,
+      top: this.options.top ? this.options.top : '50%',
+      left : '50%'
+    })
+    .hide()
+    .appendTo('body');
 
-      // Open the modalbox if setted as it.
-      if (this.options.autoOpen) { this.open(); }
-    };
-
-    // Overlay template
-    // ----------------
+    // Create a jQuery Node for modalbox content, attach ot to the container
+    // and append to it the content of the initial DOM Node passed to the
+    // plugin.
     //
-    var setOverlay = function () {
-      // Create a jQuery Node, passing some CSS properties, and attaching to it
-      // some events.
-      //
-      // The Overlay is used as a fog layer behind the modal box. It receive a
-      // click handler to call the plugin close method to close the modal on a
-      // click on the fog
-      //
-      // Each overlay is dependent to its modalbox. So you'll have as many
-      // overlays as you've got active modals.
-      //
-      var $el = $('<div/>', {'class': 'sm-overlay'})
-      .css({
-        position: 'fixed',
-        zIndex: 9999,
-        top: 0,
-        left: 0,
-        height: '100%',
-        width: '100%',
-        background: '#000'
-      })
-      .hide()
+    // Be careful that the content isn't duplicate to the modal box, but moved
+    // to it. It authorize to create (or retrieve) content and place it
+    // directly into the modalbox, but remember that this content will be
+    // loose if you don't save it before the modalbox disposing.
+    //
+    $('<div/>', {'class': $.fn[namespace].className.content})
+    .append( $(this.element) )
+    .appendTo($el);
+
+    // If the closeButton is activated, create it and attach it to the
+    // modalbox container. It's a simple `<button>` with a click handler
+    // that'll call the plugin close method.
+    if (this.options.closeButton) {
+      $('<button/>', {'class': $.fn[namespace].className.close})
+      .append( $('<span/>', {'text': $.fn[namespace].l10n.close}) )
       .on('click', $.proxy(this.close, this))
-      .appendTo('body');
-
-      // Create a jQuery Node as overlay child to be used as a throbber. It'll
-      // show at call and hide when the modal appear.
-      //
-      $('<div/>', {'class': 'sm-loader'})
-      .hide()
       .appendTo($el);
+    }
 
-      return $el;
-    };
+    return $el;
+  };
 
-    // Modal template
-    // --------------
+  // ToggleLoader (pseudo private)
+  // -----------------------------
+  //
+  // Simple toggle wrapper for the thobber inside the current overlay.
+  //
+  Plugin.prototype._toggleLoader = function () {
+    this.$overlay.find('.' + $.fn[namespace].className.loader).toggle();
+  };
+
+  // Open (public)
+  // -------------
+  //
+  // The opening method. It can be called inside the plugin, or outside
+  // directly by passing the call to the attached plugin.
+  //
+  // e.g.:
+  //
+  //     // Init the modalbox
+  //     var options = {
+  //       autoOpen: false
+  //     };
+  //     $('#mybox').simplemodal(options);
+  //
+  //     // Call the open later (e.g. in a onClick handler)
+  //     $('#mybox').simplemodal('open');
+  //
+  Plugin.prototype.open = function() {
+    // Proxying the close method to the current plugin instance, and the
+    // optional `onOpen` callback to the current DOM element (mapped to
+    // the context inside the callback).
     //
-    var setModal = function () {
-      var $el,
-          // Expand className with the default modal className and custom ones.
-          className = 'sm-modal';
+    var close = $.proxy(this.close, this),
+        toggleLoader = $.proxy(this._toggleLoader, this),
+        onOpen = $.noop;
 
-      if (this.options.className) {
-       className += ' ' + this.options.className;
-      }
+    if ($.type(this.options.opOpen) === 'function') {
+      onOpen = $.proxy(this.options.onOpen, this.element);
+    }
 
-      // Create a jQuery Node for the modal box container, and set some CSS
-      // properties.
-      //
-      $el = $('<div/>', {'class': className})
-      .css({
-        position : 'fixed',
-        zIndex: 9999,
-        top: this.options.top? this.options.top : '50%',
-        left : '50%'
-      })
-      .hide()
-      .appendTo('body');
-
-      // Create a jQuery Node for modalbox content, attach ot to the container
-      // and append to it the content of the initial DOM Node passed to the
-      // plugin.
-      //
-      // Be careful that the content isn't duplicate to the modal box, but moved
-      // to it. It authorize to create (or retrieve) content and place it
-      // directly into the modalbox, but remember that this content will be
-      // loose if you don't save it before the modalbox disposing.
-      //
-      $('<div/>', {'class': 'sm-content'})
-      .append( $(this.element) )
-      .appendTo($el);
-
-      // If the closeButton is activated, create it and attach it to the
-      // modalbox container. It's a simple `<button>` with a click handler
-      // that'll call the plugin close method.
-      if (this.options.closeButton) {
-        $('<button/>', {'class': 'sm-close'})
-        .append( $('<span/>', {'text': 'close'}) )
-        .on('click', $.proxy(this.close, this))
-        .appendTo($el);
-      }
-
-      return $el;
-    };
-
-    // ToggleLoader
-    // ------------
+    // Animate the overlay with a fade from `0` to the passed option value.
+    // Toggle the throbber (show it) inside the overlay for waiting to the
+    // modalbox.
     //
-    // Simple toggle wrapper for the thobber inside the current overlay.
-    //
-    var toggleLoader = function () {
-      this.$overlay.find('.sm-loader').toggle();
-    };
+    this.$overlay
+    .fadeTo(this.options.duration, this.options.overlay, toggleLoader);
 
-    // Open (public)
-    // -------------
+    // Compute the modalbox dimensions to centerize it horizontaly and
+    // verticaly (or just place it to the top position if you passed a top
+    // value in the options hash).
     //
-    // The opening method. It can be called inside the plugin, or outside
-    // directly by passing the call to the attached plugin.
+    this.$el
+    .css({
+      marginTop : this.options.top ? 0 : this.$el.outerHeight() / -2 + 'px',
+      marginLeft: this.$el.outerWidth() / -2 + 'px'
+    })
+    // Then fade it from `0` tp `100` and call the optional `onOpen` callback
+    // at end.
     //
-    // e.g.:
-    //
-    //     // Init the modalbox
-    //     var options = {
-    //       autoOpen: false
-    //     };
-    //     $('#mybox').simplemodal(options);
-    //
-    //     // Call the open later (e.g. in a onClick handler)
-    //     $('#mybox').simplemodal('open');
-    //
-    Plugin.prototype.open = function() {
-      // Proxying the close method to the current plugin instance, and the
-      // optional `onOpen` callback to the current DOM element (mapped to
-      // the context inside the callback).
-      //
-      var close = $.proxy(this.close, this),
-          toggleLoader = $.proxy(toggleLoader, this),
-          onOpen = $.proxy(this.options.onOpen, this.element);
+    .fadeIn(this.options.duration, onOpen);
 
-      // Animate the overlay with a fade from `0` to the passed option value.
-      // Toggle the throbber (show it) inside the overlay for waiting to the
-      // modalbox.
-      //
-      this.$overlay
-      .fadeTo(this.options.duration, this.options.overlay, toggleLoader);
-
-      // Compute the modalbox dimensions to centerize it horizontaly and
-      // verticaly (or just place it to the top position if you passed a top
-      // value in the options hash).
-      //
-      this.$el
-      .css({
-        marginTop: this.options.top? 0 : this.$el.outerHeight() / -2 + 'px',
-        marginLeft: this.$el.outerWidth() / -2 + 'px'
-      })
-      // Then fade it from `0` tp `100` and call the optional `onOpen` callback
-      // at end.
-      //
-      .fadeIn(this.options.duration, onOpen);
-
-      // We also attach the close event to the `ESC` key.
-      //
-      $(document).one('keyup', function (e) {
-        if (e.which === 27) { close(); }
-      });
-    };
-
-    // Close (public)
-    // --------------
+    // We also attach the close event to the `ESC` key.
     //
-    // The closing method, can be called inside the plugin or outside by passing
-    // the call to the attached plugin (see #open for an exemple of use).
+    $(document).one('keyup', function (e) {
+      if (e.which === 27) { close(); }
+    });
+  };
+
+  // Close (public)
+  // --------------
+  //
+  // The closing method, can be called inside the plugin or outside by passing
+  // the call to the attached plugin (see #open for an exemple of use).
+  //
+  Plugin.prototype.close = function() {
+    // Create a callback ready to be fired at fading end, binded to the
+    // current plugin instance. It calls the optional `onClose` callback and
+    // dispose the modalbox if setted in the options hash.
     //
-    Plugin.prototype.close = function() {
-      // Create a callback ready to be fired at fading end, binded to the
-      // current plugin instance. It calls the optional `onClose` callback and
-      // dispose the modalbox if setted in the options hash.
-      //
-      var onClose = $.proxy(function () {
-        // Proxying the optional `onClose` callback to the current DOM element
-        // mapped to the context inside the callback.
+    var onClose = $.proxy(function () {
+      // Proxying the optional `onClose` callback to the current DOM element
+      // mapped to the context inside the callback.
+      if ($.type(this.options.onClose) === 'function') {
         this.options.onClose.call(this.element);
+      }
 
-        // If the modalbox needs to be disposed when closed, we destroy it.
-        if (this.options.autoDestroy) {
-          this.destroy();
-        }
-      }, this);
+      // If the modalbox needs to be disposed when closed, we destroy it.
+      if (this.options.autoDestroy) {
+        this.destroy();
+      }
+    }, this);
 
-      // We simply fadeOut the overlay and the container, toggling the throbber
-      // at end and calling the optional `onClose` callback.
-      //
-      this.$overlay
-      .fadeOut(this.options.duration, $.proxy(toggleLoader, this));
-
-      this.$el
-      .fadeOut(this.options.duration, onClose);
-    };
-
-    // Destroy (public)
-    // ----------------
+    // We simply fadeOut the overlay and the container, toggling the throbber
+    // at end and calling the optional `onClose` callback.
     //
-    // The dispose method that simply remove the created nodes from the DOM.
-    // Remember that the content of the modalbox is **not** saved and will be
-    // removed from the DOM if you don't save it before.
-    //
-    Plugin.prototype.destroy = function() {
-      this.$overlay.remove();
-      this.$el.remove();
-    };
+    this.$overlay
+    .fadeOut(this.options.duration, $.proxy(this._toggleLoader, this));
 
-    // Expose the Plugin externaly
-    return Plugin;
+    this.$el
+    .fadeOut(this.options.duration, onClose);
+  };
 
-  })();
+  // Destroy (public)
+  // ----------------
+  //
+  // The dispose method that simply remove the created nodes from the DOM.
+  // Remember that the content of the modalbox is **not** saved and will be
+  // removed from the DOM if you don't save it before.
+  //
+  Plugin.prototype.destroy = function() {
+    this.$overlay.remove();
+    this.$el.remove();
+  };
+
 
   // JQUERY
   // ===========================================================================
@@ -298,10 +272,36 @@
         $.data(this, ns, new Plugin(this, options));
       }
       // If the plugin contains the called method, apply it
-      else if(plugin[_] && $.type(plugin[_]) === 'function') {
+      else if(plugin[_] && $.type(plugin[_]) === 'function' && _.indexOf('_') !== 0) {
         return plugin[_].apply(plugin, args);
       }
     });
   };
 
+  // Default configuration
+  $.fn[namespace].defaults = {
+    top         : null,          // Fix `Top` position instead of vertical centering
+    overlay     : 0.5,           // Set overlay opacity
+    closeButton : false,         // Enable / Disable a close button inside the modal
+    className   : null,          // Add one (or more) class(es) to the modal box
+    duration    : 500,           // Duration of transition
+    autoOpen    : false,         // Open the modalbox when created
+    autoDestroy : false,         // Destroy the modalbox when it is closed
+    onOpen      : function() {}, // Callback to execute at Open event
+    onClose     : function() {}  // Callback to execute at Close event
+  };
+
+  // Default class names
+  $.fn[namespace].className = {
+    overlay : 'sm-overlay',
+    loader  : 'sm-loader',
+    modal   : 'sm-modal',
+    content : 'sm-content',
+    close   : 'sm-close'
+  };
+
+  // Default displayed string
+  $.fn[namespace].l10n = {
+    close : 'close'
+  };
 })(jQuery);
