@@ -168,7 +168,7 @@
         toggleLoader = $.proxy(this._toggleLoader, this),
         onOpen = $.noop;
 
-    if ($.type(this.options.opOpen) === 'function') {
+    if ($.type(this.options.onOpen) === 'function') {
       onOpen = $.proxy(this.options.onOpen, this.element);
     }
 
