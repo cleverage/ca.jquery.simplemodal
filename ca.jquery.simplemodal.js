@@ -57,8 +57,7 @@
   // ---------------------------------
   //
   Plugin.prototype._setOverlay = function () {
-    // Create a jQuery Node, passing some CSS properties, and attaching to it
-    // some events.
+    // Create a jQuery Node, and attaching to it some events.
     //
     // The Overlay is used as a fog layer behind the modal box. It receive a
     // click handler to call the plugin close method to close the modal on a
@@ -68,15 +67,6 @@
     // overlays as you've got active modals.
     //
     var $el = $('<div/>', {'class': this._getClass('overlay')})
-    .css({
-      position: 'fixed',
-      zIndex: 9999,
-      top: 0,
-      left: 0,
-      height: '100%',
-      width: '100%',
-      background: '#000'
-    })
     .hide()
     .on('click', $.proxy(this.close, this))
     .appendTo('body');
@@ -103,16 +93,9 @@
       className += ' ' + this.options.className;
     }
 
-    // Create a jQuery Node for the modal box container, and set some CSS
-    // properties.
+    // Create a jQuery Node for the modal box container.
     //
     $el = $('<div/>', {'class': className})
-    .css({
-      position : 'fixed',
-      zIndex: 9999,
-      top: this.options.top ? this.options.top : '50%',
-      left : '50%'
-    })
     .hide()
     .appendTo('body');
 
@@ -188,18 +171,10 @@
     this.$overlay
     .fadeTo(this.options.duration, this.options.overlay, toggleLoader);
 
-    // Compute the modalbox dimensions to centerize it horizontaly and
-    // verticaly (or just place it to the top position if you passed a top
-    // value in the options hash).
-    //
-    this.$el
-    .css({
-      marginTop : this.options.top ? 0 : this.$el.outerHeight() / -2 + 'px',
-      marginLeft: this.$el.outerWidth() / -2 + 'px'
-    })
-    // Then fade it from `0` tp `100` and call the optional `onOpen` callback
+    // Fade it from `0` tp `100` and call the optional `onOpen` callback
     // at end.
     //
+    this.$el
     .fadeIn(this.options.duration, onOpen);
 
     // We also attach the close event to the `ESC` key.
