@@ -34,7 +34,7 @@
   function Plugin(element, options) {
     // Store elements to access it later easily
     this.element = element;
-    this.options = $.extend({}, $.fn[namespace].defaults, options);
+    this.options = $.extend({classNames: {}}, $.fn[namespace].defaults, options);
 
     // Create and stores all DOM elements using the Plugin as context.
     this.$overlay = this._setOverlay();
@@ -43,6 +43,15 @@
     // Open the modalbox if setted as it.
     if (this.options.autoOpen) { this.open(); }
   }
+
+
+  // Return a class from current options or main configuration (pseudo private)
+  // ---------------------------------
+  //
+  Plugin.prototype._getClass = function(className) {
+    return this.options.classNames[className] ||
+           $.fn[namespace].className[className];
+  };
 
   // Overlay template (pseudo private)
   // ---------------------------------
@@ -58,7 +67,7 @@
     // Each overlay is dependent to its modalbox. So you'll have as many
     // overlays as you've got active modals.
     //
-    var $el = $('<div/>', {'class': $.fn[namespace].className.overlay})
+    var $el = $('<div/>', {'class': this._getClass('overlay')})
     .css({
       position: 'fixed',
       zIndex: 9999,
@@ -75,7 +84,7 @@
     // Create a jQuery Node as overlay child to be used as a throbber. It'll
     // show at call and hide when the modal appear.
     //
-    $('<div/>', {'class': $.fn[namespace].className.loader})
+    $('<div/>', {'class': this._getClass('loader')})
     .hide()
     .appendTo($el);
 
@@ -88,7 +97,7 @@
   Plugin.prototype._setModal = function () {
     var $el,
         // Expand className with the default modal className and custom ones.
-        className = $.fn[namespace].className.modal;
+        className = this._getClass('modal');
 
     if (this.options.className) {
       className += ' ' + this.options.className;
@@ -116,7 +125,7 @@
     // directly into the modalbox, but remember that this content will be
     // loose if you don't save it before the modalbox disposing.
     //
-    $('<div/>', {'class': $.fn[namespace].className.content})
+    $('<div/>', {'class': this._getClass('content')})
     .append( $(this.element) )
     .appendTo($el);
 
@@ -124,7 +133,7 @@
     // modalbox container. It's a simple `<button>` with a click handler
     // that'll call the plugin close method.
     if (this.options.closeButton) {
-      $('<button/>', {'class': $.fn[namespace].className.close})
+      $('<button/>', {'class': this._getClass('close')})
       .append( $('<span/>', {'text': $.fn[namespace].l10n.close}) )
       .on('click', $.proxy(this.close, this))
       .appendTo($el);
@@ -139,7 +148,7 @@
   // Simple toggle wrapper for the thobber inside the current overlay.
   //
   Plugin.prototype._toggleLoader = function () {
-    this.$overlay.find('.' + $.fn[namespace].className.loader).toggle();
+    this.$overlay.find('.' + this._getClass('loader')).toggle();
   };
 
   // Open (public)
@@ -279,7 +288,7 @@
   };
 
   // Default configuration
-  $.fn[namespace].defaults = {
+  $.fn[namespace].defaults = $.extend({
     top         : null,          // Fix `Top` position instead of vertical centering
     overlay     : 0.5,           // Set overlay opacity
     closeButton : false,         // Enable / Disable a close button inside the modal
@@ -289,19 +298,20 @@
     autoDestroy : false,         // Destroy the modalbox when it is closed
     onOpen      : function() {}, // Callback to execute at Open event
     onClose     : function() {}  // Callback to execute at Close event
-  };
+  }, $.fn[namespace].defaults);
 
   // Default class names
-  $.fn[namespace].className = {
+  $.fn[namespace].className = $.extend({
     overlay : 'sm-overlay',
     loader  : 'sm-loader',
     modal   : 'sm-modal',
     content : 'sm-content',
     close   : 'sm-close'
-  };
+  }, $.fn[namespace].className);
 
   // Default displayed string
-  $.fn[namespace].l10n = {
+  $.fn[namespace].l10n = $.extend({
     close : 'close'
-  };
+  }, $.fn[namespace].l10n);
+
 })(jQuery);

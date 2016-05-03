@@ -70,6 +70,10 @@ to the modalbox container. The default class always apply is `sm-modal`. The
 
 The default value is `null` (only apply `.sm-modal` class).
 
+#### `classNames`
+
+This object will override the classes names for this modal only. (see `$.fn.simplemodal.className`)
+
 #### `closeButton`
 
 This property enable / disable the presence of a close button inside the
@@ -108,3 +112,32 @@ can takes one of the following values:
               distance from the top of the viewport.
 
 The default value is `null` (`{falsy}`).
+
+
+### Default configuration
+
+#### $.fn.simplemodal.defaults
+
+Use this object to override default options.
+
+#### $.fn.simplemodal.className
+
+Use this object to override default classes.
+```
+$.fn.simplemodal.className = {
+  overlay : 'sm-overlay',
+  loader  : 'sm-loader',
+  modal   : 'sm-modal',
+  content : 'sm-content',
+  close   : 'sm-close'
+};
+```
+
+#### $.fn.simplemodal.l10n
+
+Use this object to override default translation keys.
+```
+$.fn.simplemodal.l10n = {
+	close : 'close'
+};
+```
