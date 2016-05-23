@@ -139,6 +139,34 @@
     this.$overlay.find('.' + this._getClass('loader')).toggle();
   };
 
+  var _getScrollbarSize = (function() {
+    var scrollbarSize;
+    return function() {
+      if(scrollbarSize === undefined) {
+        var scrollDiv = document.createElement('div');
+        scrollDiv.style.cssText = 'width: 99px; height: 99px; overflow: scroll; position: absolute; top: -9999px;';
+        document.body.appendChild(scrollDiv);
+        scrollbarSize = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+        document.body.removeChild(scrollDiv);
+      }
+      return scrollbarSize;
+    };
+  })();
+
+  function disableBodyScroll() {
+    $('html').css({
+      overflow       : 'hidden',
+      'margin-right' : _getScrollbarSize()+'px'
+    });
+  }
+
+  function enableBodyScroll() {
+    $('html').css({
+      overflow       : '',
+      'margin-right' : ''
+    });
+  }
+
   // Open (public)
   // -------------
   //
@@ -164,6 +192,8 @@
     var close = $.proxy(this.close, this),
         toggleLoader = $.proxy(this._toggleLoader, this),
         onOpen = $.noop;
+
+    disableBodyScroll();
 
     if ($.type(this.options.onOpen) === 'function') {
       onOpen = $.proxy(this.options.onOpen, this.element);
@@ -201,6 +231,9 @@
     // dispose the modalbox if setted in the options hash.
     //
     var onClose = $.proxy(function () {
+
+      enableBodyScroll();
+
       // Proxying the optional `onClose` callback to the current DOM element
       // mapped to the context inside the callback.
       if ($.type(this.options.onClose) === 'function') {
