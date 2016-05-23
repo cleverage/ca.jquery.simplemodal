@@ -68,7 +68,7 @@
     //
     var $el = $('<div/>', {'class': this._getClass('overlay')})
     .hide()
-    .on('click', $.proxy(this.close, this))
+    .on('click.'+namespace, $.proxy(this.close, this))
     .appendTo('body');
 
     // Create a jQuery Node as overlay child to be used as a throbber. It'll
@@ -85,8 +85,8 @@
   // -------------------------------
   //
   Plugin.prototype._setModal = function () {
-    var $el,
-        $wrapper,
+    var that = this;
+    var $el, $wrapper, $wrapperInner,
         // Expand className with the default modal className and custom ones.
         className = this._getClass('modal');
 
@@ -100,9 +100,18 @@
     .hide()
     .appendTo('body');
 
-    $wrapper = $('<div/>', {'class': this._getClass('wrapperInner')})
-                .appendTo($el)
-                .wrap($('<div/>', {'class': this._getClass('wrapper')}));
+    $wrapper = $('<div/>', {'class': this._getClass('wrapper')})
+                // click on wrapper will close the modal
+                .on('click.'+namespace, function(e) {
+                  if($(e.target).is($wrapper)) {
+                    that.close();
+                  }
+                });
+    $wrapperInner = $('<div/>', {'class': this._getClass('wrapperInner')});
+
+    $wrapper
+      .append($wrapperInner)
+      .appendTo($el);
 
     // Create a jQuery Node for modalbox content, attach ot to the container
     // and append to it the content of the initial DOM Node passed to the
@@ -115,7 +124,7 @@
     //
     $('<div/>', {'class': this._getClass('content')})
     .append( $(this.element) )
-    .appendTo($wrapper);
+    .appendTo($wrapperInner);
 
     // If the closeButton is activated, create it and attach it to the
     // modalbox container. It's a simple `<button>` with a click handler
@@ -124,7 +133,7 @@
       $('<button/>', {'class': this._getClass('close')})
       .append( $('<span/>', {'text': $.fn[namespace].l10n.close}) )
       .on('click', $.proxy(this.close, this))
-      .appendTo($wrapper);
+      .appendTo($wrapperInner);
     }
 
     return $el;
