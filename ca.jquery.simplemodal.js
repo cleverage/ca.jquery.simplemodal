@@ -86,6 +86,7 @@
   //
   Plugin.prototype._setModal = function () {
     var $el,
+        $wrapper,
         // Expand className with the default modal className and custom ones.
         className = this._getClass('modal');
 
@@ -99,6 +100,10 @@
     .hide()
     .appendTo('body');
 
+    $wrapper = $('<div/>', {'class': this._getClass('wrapperInner')})
+                .appendTo($el)
+                .wrap($('<div/>', {'class': this._getClass('wrapper')}));
+
     // Create a jQuery Node for modalbox content, attach ot to the container
     // and append to it the content of the initial DOM Node passed to the
     // plugin.
@@ -110,7 +115,7 @@
     //
     $('<div/>', {'class': this._getClass('content')})
     .append( $(this.element) )
-    .appendTo($el);
+    .appendTo($wrapper);
 
     // If the closeButton is activated, create it and attach it to the
     // modalbox container. It's a simple `<button>` with a click handler
@@ -119,7 +124,7 @@
       $('<button/>', {'class': this._getClass('close')})
       .append( $('<span/>', {'text': $.fn[namespace].l10n.close}) )
       .on('click', $.proxy(this.close, this))
-      .appendTo($el);
+      .appendTo($wrapper);
     }
 
     return $el;
@@ -277,11 +282,13 @@
 
   // Default class names
   $.fn[namespace].className = $.extend({
-    overlay : 'sm-overlay',
-    loader  : 'sm-loader',
-    modal   : 'sm-modal',
-    content : 'sm-content',
-    close   : 'sm-close'
+    overlay      : 'sm-overlay',
+    loader       : 'sm-loader',
+    modal        : 'sm-modal',
+    wrapper      : 'sm-wrapper',
+    wrapperInner : 'sm-wrapper-inner',
+    content      : 'sm-content',
+    close        : 'sm-close'
   }, $.fn[namespace].className);
 
   // Default displayed string
