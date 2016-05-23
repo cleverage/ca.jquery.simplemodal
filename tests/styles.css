@@ -1,22 +1,112 @@
-.sm-modal {
-    box-sizing: border-box;
-    padding: 1em;
-    border: 4px solid #d4d4d4;
-    background-color: #fff;
 
-    position: relative;
+/* line 10, ../../src/scss/ui/_sm.scss */
+.sm-overlay {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 130vh;
+  height: 130%;
+  background-color: rgba(0, 0, 0, 0.95);
 }
-
+/* line 22, ../../src/scss/ui/_sm.scss */
+.sm-modal {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+/* line 33, ../../src/scss/ui/_sm.scss */
+.sm-wrapper {
+  text-align: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+/* line 40, ../../src/scss/ui/_sm.scss */
+.sm-wrapper:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+/* line 48, ../../src/scss/ui/_sm.scss */
+.sm-wrapper-inner {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 auto;
+  text-align: left;
+  max-width: 600px;
+  max-width: 37.5rem;
+  min-width: 300px;
+  min-width: 18.75rem;
+}
+/* line 58, ../../src/scss/ui/_sm.scss */
+.sm-content {
+  margin-top: 40px;
+  margin-top: 2.5rem;
+  *zoom: 1;
+  background: #fff;
+  color: #000;
+}
+/* line 38, ../../.gems/ruby/1.9.1/gems/compass-core-1.0.3/stylesheets/compass/utilities/general/_clearfix.scss */
+.sm-content:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+/* line 66, ../../src/scss/ui/_sm.scss */
 .sm-close {
-    position: absolute;
-    top: -12px;
-    right: -12px;
-
-    text-indent: -9999px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background-color: #000;
-
-    border: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  width: 1.875rem;
+  height: 30px;
+  height: 1.875rem;
+  background: #fff;
+  border-radius: 0.3125rem;
+  border: 0;
+}
+/* line 76, ../../src/scss/ui/_sm.scss */
+.sm-close span {
+  position: absolute;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+/* line 81, ../../src/scss/ui/_sm.scss */
+.sm-close:before, .sm-close:after {
+  content: '';
+  position: absolute;
+  background: #000;
+  -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+          transform: rotate(45deg);
+  height: 17px;
+  width: 17px;
+  top: 50%;
+  left: 50%;
+}
+/* line 93, ../../src/scss/ui/_sm.scss */
+.sm-close:before {
+  margin-top: -8px;
+  width: 1px;
+}
+/* line 98, ../../src/scss/ui/_sm.scss */
+.sm-close:after {
+  margin-left: -8px;
+  height: 1px;
 }
